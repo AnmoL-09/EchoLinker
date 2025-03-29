@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const connectDB = require('./config/db')
+const connectDB = require('./config/db');
+const messageRoutes = require('./routes/message');
 require("dotenv").config();
 
 
@@ -14,6 +15,7 @@ const io = new Server(server, {cors: {origin: "*"}});
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/messages",  messageRoutes);
 
 // database connection
 // mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true})
@@ -25,8 +27,8 @@ connectDB();
 io.on("connection", (socket) => {
     console.log("New WebSocket Connection",socket.id);
 
-    socket.on("message",  (data) => {
-        io.emit("message", data);
+    socket.on("sendMessage",  (data) => {
+        io.emit("receiveMessage", data);
     });
     
     socket.on("disconnect", () => {
